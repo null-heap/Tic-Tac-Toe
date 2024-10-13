@@ -28,6 +28,7 @@ const gameBoard = (function () {
     player1 = createPlayer(player1Name);
     console.log(player1.getName());
     player2 = createPlayer(player2Name);
+    resetGame();
   };
 
   //i will start will default board size, in the future i will make it into a dependency of the function...
@@ -163,9 +164,6 @@ const gameBoard = (function () {
     return { resetBoard, placeInCell };
   })();
 
-  //const getPlayer1 = () => player1;
-  //const getPlayer2 = () => player2;
-
   const getStatus = () =>{
     return `round: ${round}, draws: ${draw}
     score:
@@ -192,13 +190,16 @@ const gameBoard = (function () {
     }
     let winCheck = board.placeInCell(row, column, playerName);
     if (winCheck) {
+        round++;
+        //not a must can make it manually, but for now i will use it for the logic.
+        resetGame();
+
       if (winCheck == "draw") {
         console.log("its a draw");
         return "draw";
       } else {
         console.log(playerName + "is the winner of the round!!");
-        round++;
-        resetGame();
+        
         if (player1.getName() == playerName) {
           player1.addWin();
           player2.addLoss();
@@ -215,3 +216,5 @@ const gameBoard = (function () {
   };
   return {setNames, placeOnBoard, fullReset, resetGame, getStatus};
 })();
+
+
