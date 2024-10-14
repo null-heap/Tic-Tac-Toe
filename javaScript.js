@@ -17,6 +17,7 @@ const gameBoard = (function () {
   }
 
   let round = 1;
+  let playerTurn = 0;
   //to keep track of the draws
   let draw = 0;
   //default value
@@ -29,6 +30,22 @@ const gameBoard = (function () {
     console.log(player1.getName());
     player2 = createPlayer(player2Name);
     resetGame();
+  };
+
+  const getPlayerNameByTurn = () => {
+    if (playerTurn) {
+      return player2.getName();
+    } else {
+      return player1.getName();
+    }
+  };
+
+  const getPlayerSignByTurn = () => {
+    if (!playerTurn) {
+      return "O";
+    } else {
+      return "X";
+    }
   };
 
   //i will start will default board size, in the future i will make it into a dependency of the function...
@@ -52,7 +69,11 @@ const gameBoard = (function () {
     };
     resetBoard();
 
-    placeInCell = (cellRow, cellColumn, player) => {
+    //places current playing player name in cell, and returns his play sign if its "X" or "O",
+    //if a player wins, returns his name if its a draw, returns "draw"
+    placeInCell = (cellRow, cellColumn) => {
+      let player = getPlayerNameByTurn();
+
       //the player var accept the name
       if (cellRow < row && cellColumn < column) {
         if (board[cellRow][cellColumn] == 0) {
@@ -64,22 +85,35 @@ const gameBoard = (function () {
             "this cell is already taken by " + board[cellRow][cellColumn]
           );
           console.table(board);
+          return "taken";
         }
       } else {
+        //light validation...
         console.log("the placement is out of range...");
       }
 
       const win = checkWin();
       console.log("win: " + win);
-      return win;
+
+      //switch turns before the return statements
+      playerTurn = !playerTurn;
+      // if there is a winner or a draw return the winner name or "draw"
+      if (win) {
+        return win;
+      } else {
+        //if false it was player1 turn and if true its player2 turn
+        return getPlayerSignByTurn();
+      }
     };
 
+    //if there is a win pattern return the winner name, if the board is full- return "draw"
     function checkWin() {
       let mainDiagonal = [];
       let counterDiagonal = [];
       let pattern = 0;
 
-      let isBoardFull = 0;
+      //not used for now...
+      //let isBoardFull = 0;
 
       for (let i = 0; i < row; i++) {
         let horizontalPattern = 0;
@@ -164,16 +198,24 @@ const gameBoard = (function () {
     return { resetBoard, placeInCell };
   })();
 
-  const getStatus = () =>{
+  const getRound = () => round;
+  const getStatus = () => {
     return `round: ${round}, draws: ${draw}
     score:
-    ${player1.getName()}, wins: ${player1.getStatus().wins}, loses: ${player1.getStatus().loses}
+    ${player1.getName()}, wins: ${player1.getStatus().wins}, loses: ${
+      player1.getStatus().loses
+    }
     ************
-    ${player2.getName()}, wins: ${player2.getStatus().wins}, loses: ${player2.getStatus().loses}`;
+    ${player2.getName()}, wins: ${player2.getStatus().wins}, loses: ${
+      player2.getStatus().loses
+    }`;
   };
 
   const resetGame = () => {
     board.resetBoard();
+
+    //reset the turn count back to 0/ for player 1
+    playerTurn = 0;
   };
 
   const fullReset = () => {
@@ -183,38 +225,127 @@ const gameBoard = (function () {
     round = 0;
   };
 
-  const placeOnBoard = (row, column, playerName) => {
+  const placeOnBoard = (row, column) => {
     //a value check, but i dont think i will need to use it as long as it is 1 vs 1
-     if(playerName.toLowerCase() != player1.getName() && playerName.toLowerCase() != player2.getName()){
-         return console.log("unknown name..., pls enter a corrent one");
-    }
-    let winCheck = board.placeInCell(row, column, playerName);
-    if (winCheck) {
-        round++;
-        //not a must can make it manually, but for now i will use it for the logic.
-        resetGame();
+    //if(playerName.toLowerCase() != player1.getName() && playerName.toLowerCase() != player2.getName()){
+    //  return console.log("unknown name..., pls enter a corrent one");
+    //}
+    let winCheck = board.placeInCell(row, column);
 
+    if (winCheck == "X" || winCheck == "O") {
+      return winCheck;
+    }
+
+    if (winCheck == "taken") {
+      return "taken";
+    }
+
+    if (winCheck) {
+      round++;
+      //not a must can make it manually, but for now i will use it for the logic.
+      resetGame();
       if (winCheck == "draw") {
         console.log("its a draw");
         return "draw";
-      } else {
-        console.log(playerName + "is the winner of the round!!");
-        
-        if (player1.getName() == playerName) {
-          player1.addWin();
-          player2.addLoss();
-          //return player1.getName();
-        } else {
-          player2.addWin();
-          player1.addLoss();
-          //return player2.getName();
-        }
+      }
 
-        return "win";
+      if (player1.getName() == winCheck) {
+        player1.addWin();
+        player2.addLoss();
+        //return player1.getName();
+      } else {
+        player2.addWin();
+        player1.addLoss();
+        //return player2.getName();
+      }
+
+      return winCheck;
+    }
+  };
+  return {
+    setNames,
+    placeOnBoard,
+    fullReset,
+    resetGame,
+    getStatus,
+    getRound,
+    getPlayerNameByTurn,
+    getPlayerSignByTurn,
+  };
+})();
+
+let player1 = "ppp";
+let player2 = "hhh";
+
+//made it dependent on size var for future expansion
+const boardToDom = (function (size) {
+  //the first child because the squares are contained inside a div for styling
+  const domBoard = document.querySelector("#gameBoard").firstElementChild;
+
+  //to automaticly reset the board after a click if the game is draw or won
+
+  let endRound = 0;
+
+  const resetDomBoard = () => {
+    domBoard.textContent = "";
+    for (let i = 0; i < size; i++) {
+      //give every div on the created board a id of a cell in two dimensional array
+      for (let j = 0; j < size; j++) {
+        let id = i + "," + j;
+        let div = document.createElement("div");
+        div.setAttribute("id", id);
+
+        let divSpan = document.createElement("span");
+        divSpan.textContent = " ";
+        div.appendChild(divSpan);
+        domBoard.appendChild(div);
       }
     }
   };
-  return {setNames, placeOnBoard, fullReset, resetGame, getStatus};
-})();
+  resetDomBoard();
 
+  const playOnBoard = () => {
+    domBoard.addEventListener("click", (e) => {
+      let target = e.target;
+      let id = target.id;
+      if (endRound == 1) {
+        resetDomBoard();
+        endRound = 0;
+        //because the target is empty after the reset so the first play after the next round wont show at dom
+        //this will fix it.
+        target = document.getElementById(id);
+      }
+      //to lower case because some browsers return in upper case...
+      if (target.tagName.toLowerCase() == "span") {
+        target = target.parentElement;
+      }
+      console.log("target = " + target.id);
+      id = target.id.split(",");
 
+      let sign = gameBoard.placeOnBoard(id[0], id[1]);
+
+      console.log(sign);
+
+      target = target.firstElementChild;
+      target.textContent = gameBoard.getPlayerSignByTurn();
+
+      if (sign == "taken") {
+        endRound = 1;
+        ///statusToDom("choose a different cell, this one is already taken...")
+      } else if (sign == "draw") {
+        endRound = 1;
+        //statusToDom("It's a DRAW!!");
+      } else if(sign != "X" && sign != "O") { // could also compared to gameBoard.getPlayerNameByTurn()
+        endRound = 1;
+        //statusToDom("The winner is:" + gameBoard.getPlayerNameByTurn());
+      }
+    });
+  };
+
+  return { playOnBoard };
+})(3);
+
+//will change it to input form user
+
+//adds the click even listener to the board
+boardToDom.playOnBoard();
