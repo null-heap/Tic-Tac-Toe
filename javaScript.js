@@ -307,6 +307,12 @@ const boardToDom = (function (size) {
   const playOnBoard = () => {
     domBoard.addEventListener("click", (e) => {
       let target = e.target;
+
+      //in case span is pressed
+      if (target.tagName.toLowerCase() == "span") {
+        target = target.parentElement;
+      }
+
       let id = target.id;
       if (endRound == 1) {
         resetDomBoard();
@@ -316,9 +322,7 @@ const boardToDom = (function (size) {
         target = document.getElementById(id);
       }
       //to lower case because some browsers return in upper case...
-      if (target.tagName.toLowerCase() == "span") {
-        target = target.parentElement;
-      }
+      
       console.log("target = " + target.id);
       id = target.id.split(",");
 
@@ -342,7 +346,7 @@ const boardToDom = (function (size) {
     });
   };
 
-  return { playOnBoard };
+  return {playOnBoard};
 })(3);
 
 //will change it to input form user
