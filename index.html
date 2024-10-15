@@ -9,13 +9,28 @@
   </head>
   <body>
     <header><div>TIC - TAC - TOE</div></header>
-    <!-- <div id="main"> -->
-        <div id="gameBoard">
-          <div>
-          </div>
-        </div>
-        <div id="statusDiv">sdfsdf
-        </div>
-    <!-- </div> -->
+
+    <!-- the welcome page -->
+
+    <form id="welcomePage">
+      <label for="name">Player 1 PLS Enter your NAME!!</label>
+      <input type="text" name="name" id="name" maxlength="30"/>
+
+      <div>
+        <button id="nameCancel">CANCEL</button>
+        <button id="nameSubmit">SUBMIT</button>
+      </div>
+    </form>
+
+    <div id="gameBoard" class="hide">
+      <div></div>
+    </div>
+    <div id="statusDiv" class="hide">sdfsdf</div>
+
+    <div id="menu" class="hide">
+        <button id="roundReset">round reset</button>
+        <button id="gameReset">stats reset</button>
+        <button id="changeName" aria-label="all stats will be lost...">change name</button>
+    </div>
   </body>
 </html>

@@ -4,6 +4,7 @@
     --hover-clr: #222533;
     --text-clr: #e6e6ef;
     --accent-clr: #5e63ff;
+    --active-clr: #0f172a;
     --secondary-text-clr: #b0b3c1;
 }
 
@@ -11,6 +12,22 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* light reset */
+button,label,input{
+    display: block;
+    font-family: inherit;
+    font-size: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    /* max-width: 100%; */
+    /* min-width: min-content; */
+    padding: 5px;
+    height:30px;
+    border: none;
+    border-radius: 5px;
+
 }
 
 html{
@@ -87,3 +104,80 @@ header > div{
 
     
 }
+
+
+#welcomePage{
+    
+    color: var(--secondary-text-clr);
+    max-width: 900px;
+    font-size: calc(min(3em, 5vw));
+    grid-area: 2 / 2 / 3/ 3;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    text-wrap: nowrap;
+
+    input{
+        width: 30ch;
+        height: fit-content;
+        color: inherit;
+
+    }
+    > div{
+        align-self: flex-end;
+    }
+
+
+    
+
+}
+
+button{
+        
+    color: inherit;
+    display: inline;
+    width: 10ch;
+    
+    height: min-content;
+    padding: 0.2em;
+    
+}
+
+input,button{
+    background-color: var(--line-clr);
+    outline: none;
+    min-width: 10ch;
+}
+:focus-visible, :focus{
+    outline: 3px solid var(--accent-clr);
+}
+button:hover{
+    background-color: var(--hover-clr);
+}
+button:active{
+    background-color: var(--active-clr);
+}
+
+#menu{
+    grid-area: 2 / 3 / 4/ 4;
+    font-size: calc(min(1.5em, 3vw));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--secondary-text-clr);
+    button{
+        padding: 0.5em;
+        margin: 1em 0;
+        display: inline;
+        width: 15ch;
+    }
+}
+
+
+/* making the welcome page */
+/* i can do display none but its bad for accessability so this is the alternative*/
+.hide {
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+ }

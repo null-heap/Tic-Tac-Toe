@@ -1,3 +1,60 @@
+//getting player names:
+const getNames = (function () {
+  const nameForm = document.getElementById("welcomePage");
+  const nameInput = document.getElementById("name");
+  const nameLabel = nameForm.querySelector("label");
+
+  const hidden = document.querySelectorAll("header ~ *");
+
+  let turn = 0;
+
+  let player1;
+  let player2;
+
+  nameForm.addEventListener("click", (e) => {
+    e.preventDefault();
+    let target = e.target;
+    if (target.id == "nameCancel") {
+      if (!turn) {
+        player1 = "player1";
+        turn = !turn;
+        nameLabel.innerText = "Player 2 PLS Enter your NAME!!";
+      } else {
+        player2 = "player2";
+        turn = !turn;
+        submitName();
+      }
+      nameInput.value = "";
+    } else if (target.id == "nameSubmit") {
+      if (!turn) {
+        nameLabel.innerText = "Player 2 PLS Enter your NAME!!";
+        player1 = nameInput.value;
+        turn = !turn;
+      } else {
+        player2 = nameInput.value;
+        turn = !turn;
+        submitName();
+      }
+      nameInput.value = "";
+    }
+  });
+
+  const submitName = () => {
+    nameLabel.innerText = "Player 1 PLS Enter your NAME!!";
+    gameBoard.setNames(player1, player2);
+    hideElements();
+    boardToDom.statusToDom(gameBoard.getStatus());
+  };
+
+  const hideElements = () => {
+    hidden.forEach((node) => {
+      node.classList.toggle("hide");
+    });
+  };
+
+  return { hideElements };
+})();
+
 const gameBoard = (function () {
   function createPlayer(name) {
     let wins = 0;
@@ -223,8 +280,8 @@ const gameBoard = (function () {
   const fullReset = () => {
     player1.resetStatus();
     player2.resetStatus();
-    resetGame();
     round = 0;
+    boardToDom.resetDomBoard();
   };
 
   const placeOnBoard = (row, column) => {
@@ -245,12 +302,13 @@ const gameBoard = (function () {
     if (winCheck) {
       round++;
       //not a must can make it manually, but for now i will use it for the logic.
-      //can be done 
+      //can be done
       //by the DOM function, wastefull the repeat it
       //using it will reset the turn in the last turn...
       //resetGame();
       if (winCheck == "draw") {
         console.log("its a draw");
+        draw++;
         return "draw";
       }
 
@@ -279,9 +337,6 @@ const gameBoard = (function () {
   };
 })();
 
-let player1 = "ppp";
-let player2 = "hhh";
-
 //made it dependent on size var for future expansion
 const boardToDom = (function (size) {
   //the first child because the squares are contained inside a div for styling
@@ -290,6 +345,10 @@ const boardToDom = (function (size) {
   //to automaticly reset the board after a click if the game is draw or won
 
   let endRound = 0;
+  const statusToDom = (stats) => {
+    const statusDiv = document.getElementById("statusDiv");
+    statusDiv.innerText = stats;
+  };
 
   const resetDomBoard = () => {
     domBoard.textContent = "";
@@ -306,13 +365,13 @@ const boardToDom = (function (size) {
         domBoard.appendChild(div);
       }
     }
-  };
-  resetDomBoard();
 
-  const statusToDom = (stats) => {
-    const statusDiv = document.getElementById('statusDiv');
-    statusDiv.innerText = stats;
+    //reset the logic without reset to the players stats
+    gameBoard.resetGame();
+    statusToDom(gameBoard.getStatus());
   };
+
+  resetDomBoard();
 
   const playOnBoard = () => {
     domBoard.addEventListener("click", (e) => {
@@ -329,13 +388,11 @@ const boardToDom = (function (size) {
         endRound = 0;
         //because the target is empty after the reset so the first play after the next round wont show at dom
         //this will fix it.
-        target = document.getElementById(id);
 
-        //reset the logic without reset to the players stats
-        gameBoard.resetGame();
+        target = document.getElementById(id);
       }
       //to lower case because some browsers return in upper case...
-      
+
       console.log("target = " + target.id);
       id = target.id.split(",");
 
@@ -345,7 +402,6 @@ const boardToDom = (function (size) {
 
       target = target.firstElementChild;
 
-      
       target.textContent = gameBoard.getPlayerSignByTurn();
 
       if (sign == "taken") {
@@ -354,19 +410,40 @@ const boardToDom = (function (size) {
       } else if (sign == "draw") {
         endRound = 1;
         statusToDom("It's a DRAW!!");
-      } else if(sign != "X" && sign != "O") { // could also compared to gameBoard.getPlayerNameByTurn()
+      } else if (sign != "X" && sign != "O") {
+        // could also compared to gameBoard.getPlayerNameByTurn()
         endRound = 1;
         statusToDom("The winner is: " + sign);
-      }else{
+      } else {
         statusToDom(gameBoard.getStatus());
       }
     });
   };
 
-  return {playOnBoard};
+  return { playOnBoard, statusToDom, resetDomBoard };
 })(3);
 
 //will change it to input form user
 
 //adds the click even listener to the board
 boardToDom.playOnBoard();
+
+//buttons
+const buttons = (() => {
+  const buttonMenu = document.getElementById("menu");
+
+  buttonMenu.addEventListener("click", (e) => {
+    let target = e.target;
+    console.log(target);
+    if (target.id == "roundReset") {
+      boardToDom.resetDomBoard();
+    }else if(target.id == "gameReset"){
+        gameBoard.fullReset();
+    }else if(target.id == "changeName"){
+        getNames.hideElements();
+    }
+  });
+})();
+
+
+//change name popup functionality
