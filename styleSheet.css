@@ -23,28 +23,37 @@ body{
     background-color: var(--base-clr);
     color: var(--text-clr);
     display: grid;
-    gap: 2rem;
-    grid-template-columns: 2fr 1fr 4fr 1fr 2fr;
+    
+    row-gap: 2em;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: min-content 1fr auto 1fr;
 }
 
 header{
-    grid-area: 1 / 1 / 2 / 6;
+    grid-area: 1 / 1 / 2 / 4;
     align-self: center;
     padding: 3em;
     border-bottom: 1px solid var(--line-clr);
 
 }
+
+/* #main{
+    grid-area: 2 / 2/ 5/ 3;
+    display: grid;
+    max-width: 450px;
+    row-gap: 2em;
+} */
 header > div{
     font-size: 4rem;
     text-align: center;
 }
 #gameBoard{
-    grid-area: 2 / 3 / 4 / 4;
+    grid-area: 2 / 2 / 4 / 3;
     
 }
 #gameBoard > div{
     margin: 0 auto;
+    /* to make the div get max size */
     height: 100%;
     max-width: 400px;
     display: grid;
@@ -62,4 +71,19 @@ header > div{
 #gameBoard span{
     color: var(--accent-clr);
     font-size: 4em;
+}
+
+/* status div */
+
+#statusDiv{
+    grid-area: 4 / 2 / 5 / 3;
+    margin-left: -2em;
+    margin-right: -2em;
+    border: 1px solid var(--line-clr);
+    color: var(--secondary-text-clr);
+    max-height: 60%;
+    padding: 1em;
+    max-height: 25ch;
+
+    
 }

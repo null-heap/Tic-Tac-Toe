@@ -200,12 +200,14 @@ const gameBoard = (function () {
 
   const getRound = () => round;
   const getStatus = () => {
-    return `round: ${round}, draws: ${draw}
+    return `It's ${getPlayerNameByTurn()} Turn!!
+    round: ${round}    draws: ${draw}
+
     score:
     ${player1.getName()}, wins: ${player1.getStatus().wins}, loses: ${
       player1.getStatus().loses
     }
-    ************
+    ---------------------------
     ${player2.getName()}, wins: ${player2.getStatus().wins}, loses: ${
       player2.getStatus().loses
     }`;
@@ -243,7 +245,10 @@ const gameBoard = (function () {
     if (winCheck) {
       round++;
       //not a must can make it manually, but for now i will use it for the logic.
-      resetGame();
+      //can be done 
+      //by the DOM function, wastefull the repeat it
+      //using it will reset the turn in the last turn...
+      //resetGame();
       if (winCheck == "draw") {
         console.log("its a draw");
         return "draw";
@@ -304,6 +309,11 @@ const boardToDom = (function (size) {
   };
   resetDomBoard();
 
+  const statusToDom = (stats) => {
+    const statusDiv = document.getElementById('statusDiv');
+    statusDiv.innerText = stats;
+  };
+
   const playOnBoard = () => {
     domBoard.addEventListener("click", (e) => {
       let target = e.target;
@@ -320,6 +330,9 @@ const boardToDom = (function (size) {
         //because the target is empty after the reset so the first play after the next round wont show at dom
         //this will fix it.
         target = document.getElementById(id);
+
+        //reset the logic without reset to the players stats
+        gameBoard.resetGame();
       }
       //to lower case because some browsers return in upper case...
       
@@ -331,17 +344,21 @@ const boardToDom = (function (size) {
       console.log(sign);
 
       target = target.firstElementChild;
+
+      
       target.textContent = gameBoard.getPlayerSignByTurn();
 
       if (sign == "taken") {
         endRound = 1;
-        ///statusToDom("choose a different cell, this one is already taken...")
+        statusToDom("choose a different cell, this one is already taken...");
       } else if (sign == "draw") {
         endRound = 1;
-        //statusToDom("It's a DRAW!!");
+        statusToDom("It's a DRAW!!");
       } else if(sign != "X" && sign != "O") { // could also compared to gameBoard.getPlayerNameByTurn()
         endRound = 1;
-        //statusToDom("The winner is:" + gameBoard.getPlayerNameByTurn());
+        statusToDom("The winner is: " + sign);
+      }else{
+        statusToDom(gameBoard.getStatus());
       }
     });
   };
